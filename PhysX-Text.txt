@@ -1,0 +1,82 @@
+Objekt (Actor) erstellen:
+
+	- 1. Shape erstellen:
+		Klasse PxPhysics besitzt Funktion createShape die als Rückgabewert PxShape hat
+		
+		Definition der Funktion: 
+			inline PxShape *createShape(const PxGeometry &geometry, const PxMaterial &material, bool isExclusive = false, PxShapeFlags shapeFlags = PxShapeFlag::eVISUALIZATION | PxShapeFlag::eSCENE_QUERY_SHAPE | PxShapeFlag::eSIMULATION_SHAPE)
+
+			https://nvidia-omniverse.github.io/PhysX/physx/5.1.3/_build/physx/latest/class_px_physics.html?highlight=inline%20pxshape%20createshape%20const%20pxgeometry%20geometry%20const%20pxmaterial%20material%20bool%20isexclusive%20false%20pxshapeflags%20shapeflags%20pxshapeflag%20evisualization%20pxshapeflag%20escene_query_shape%20pxshapeflag%20esimulation_shape#_CPPv4N9PxPhysics11createShapeERK10PxGeometryRK10PxMaterialb12PxShapeFlags
+
+			Nur die ersten beiden Parameter haben keinen default-Wert, der werde ich nur diese erläutern:
+			
+				const PxGeometry &geometry = Eine Konstante Referenz
+					Bsp.: 
+						inline PxBoxGeometry(PxReal hx = 0.0f, PxReal hy = 0.0f, PxReal hz = 0.0f)
+						
+						https://nvidia-omniverse.github.io/PhysX/physx/5.1.3/_build/physx/latest/class_px_box_geometry.html?highlight=pxboxgeometry#_CPPv413PxBoxGeometry
+					
+						physx::PxBoxGeometry(1, 1, 1)
+
+
+
+						Es gibt auch noch mehr Objekte die Erzeugt werden können, wie z.B. eine Kapsel mit:
+
+						inline PxCapsuleGeometry(PxReal radius_ = 0.0f, PxReal halfHeight_ = 0.0f)
+						
+						https://nvidia-omniverse.github.io/PhysX/physx/5.1.3/_build/physx/latest/class_px_capsule_geometry.html?highlight=pxcapsulegeometry#_CPPv4N17PxCapsuleGeometry17PxCapsuleGeometryE6PxReal6PxReal
+
+				
+				
+				
+				const PxMaterial &material = Eine Konstante Referenz
+					Um Material zu erstellen Funktion 
+					
+						virtual PxMaterial *createMaterial(PxReal staticFriction, PxReal dynamicFriction, PxReal restitution) = 0
+						
+						https://nvidia-omniverse.github.io/PhysX/physx/5.1.3/_build/physx/latest/class_px_physics.html?highlight=creatematerial#_CPPv4N9PxPhysics14createMaterialE6PxReal6PxReal6PxReal
+						
+					
+					nutzen
+					
+					gibt PxMaterial zurück, daher:
+					
+						physx::PxPhysics*						mPhysics = NULL;
+						physx::PxMaterial*						mMaterial = NULL;
+						mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+
+				
+
+			#Erst Parameter erläutern, wie z.B. das mit PxGeometry ein "Block" erstellt wird, oder mit PxCapsuleGeometry eine Kapsel
+
+
+		Shape zuweisen:
+			physx::PxShape* shape = mPhysics->createShape(physx::PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
+
+
+
+		Körper erstellen:
+		
+			Zuerst Transform erstellen:
+					physx::PxTransform localTm(physx::PxVec3(physx::PxReal(0), physx::PxReal(0), 0));
+
+		
+			physx::PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
+			body->attachShape(*shape);
+			
+			
+		Dem Körper Masse hinzufügen:
+		
+			static bool updateMassAndInertia(PxRigidBody &body, PxReal density, const PxVec3 *massLocalPose = NULL, bool includeNonSimShapes = false)
+			https://nvidia-omniverse.github.io/PhysX/physx/5.1.3/_build/physx/latest/class_px_rigid_body_ext.html?highlight=updatemassandinertia#_CPPv4N14PxRigidBodyExt20updateMassAndInertiaER11PxRigidBody6PxRealPK6PxVec3b
+
+		
+			physx::PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
+
+		
+		Das Objekt zur Szene hinzufügen:
+			mScene->addActor(*body);
+			
+			
+		Objekt löschen löschen:
+			

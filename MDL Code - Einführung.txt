@@ -1,0 +1,117 @@
+MDL (Material Definition Language) - Basiernd auf MDL_Handbook (http://mdlhandbook.com/mdl_handbook/mdl_handbook.210505.A4.pdf)
+
+
+Syntax von Material-Typ (material type) ist ein ähnliches Prinzip wie "struct"-Typ wie in C/C++
+
+Der struct-Typ
+
+- struct ist eine Menge von Namen mit Typen für jene Werte
+- Der primäre Numerische Typ ist float
+
+Beispiel für Kreis-Definition:
+
+struct circle{
+	float x;
+	float y;
+	float radius;
+};
+
+Die Variablen x und y stellen hier die Koordinaten dar, und radius den Radius des Kreises
+
+Um den Konstruktor aufzurufen, wird ein einfaches
+
+circle(1,2,3);
+
+benötigt.
+
+Das ganze geht auch mit Farben:
+
+struct color{
+	float red;
+	float green;
+	float blue;
+};
+
+Zuweisung: color dark_red = color(0.5, 0.1, 0.2);
+
+---------------------------------------------------------------------------
+
+Default-Values:
+
+struct color{
+	float red = 1.0;
+	float green = 1.0;
+	float blue = 1.0;
+};
+
+---------------------------------------------------------------------------
+
+Compound structs:
+
+struct tinted_circle{
+	flaot x = 0.0;
+	float y = 0.0;
+	flaot radius = 1.0;
+	color tind = color(0.5, 0.5, 0.5);
+};
+
+Aufruf:
+	tinted_circle(tint: color(1, 0, 0));
+	tinted_circle(2, 4, 10, color(0.5, 0.1, 0.2));
+	tinted_circle(	x: 2, 
+					y: 4, 
+					radius: 10, 
+					tind: color(red: 0.5, 
+								green: 0.1, 
+								blue: 0.2));
+								
+---------------------------------------------------------------------------
+
+Zugriff auf Komponenten:
+
+circle upper_circle = circle(0.0, 5.0, 1.0);
+
+float radius = upper_circle.radius;
+
+---------------------------------------------------------------------------
+
+Material Aufbau:
+
+- Material
+	- Surface properties of front-facing surfaces
+		- Reflection
+		- Transmission
+		- Emission
+	- Surface properties of back-facing surfaces
+		- Reflection
+		- Transmission
+		- Emission
+	- Volume properties
+	- Geometric properties
+	- Shared properties
+		- Index of refraction
+		- Surface treated as boundary of volume
+
+
+Wird dargestellt durch Typen:
+	
+	Name:			Datentyp:			Beschreibung:
+	thin_walled		bool				Unterscheidet zwischen Grenzen und zweiseitigen Objekten
+	surfaces		material_surface	Definiert die Wechselwirkung zwischen Light und Oberfläche
+	backface		material_surface	Definiert die Wechselwirkung von Licht und der "Rückseite" der Oberfläche
+	ior				color				Definiert den Brechungsindex für lichtbrechende Objekte
+	volume			material_volume		Definiert die Wechselwirkung von Licht und Volumen
+	geometry		material_geometry	Definiert geometrische Änderungen zur Renderzeit
+
+
+struct material {
+	uniform bool thin_walled = false;
+	material_surface surface = material_surface();
+	material_surface backface = material_surface();
+	uniform color ior = color(1.0);
+	material_volume volume = material_volume();
+	material_geometry geometry = material_geometry();
+};
+
+Typmodifikator uniform -> nicht variieren
+
